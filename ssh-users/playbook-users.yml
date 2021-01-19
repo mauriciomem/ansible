@@ -1,0 +1,45 @@
+---
+- name: prueba packer
+  hosts: localhost
+  gather_facts: yes
+  vars:
+    users:
+      - kubeuser
+      - k8suser
+    kubeadm:
+      - test
+    docker:
+      - img
+
+  tasks:
+    - name: Funciona ansible? - probar conectividad
+      ping:
+
+    - name: Create kubernetes user
+      user:
+        name: "{{ item }}"
+        shell: /bin/bash
+        state: present
+      with_items: "{{users}}"
+
+    - name: copy auth key
+      authorized_key:
+        user: "{{ item }}"
+        key: "{{ lookup('file', lookup('env', 'HOME') +  '/.ssh/id_rsa.pub') }}"
+      with_items: "{{users}}"
+
+    - name: create user sudoers file
+      file:
+        path: '/etc/sudoers.d/{{ item }}'
+        state: touch
+        mode: u=rw,g=r,o=r
+      with_items: "{{ users }}"
+
+    - name: create user policy sudoers file
+      lineinfile:
+        path: '/etc/sudoers.d/{{ item }}'
+        state: present
+        line: '{{ item }} ALL=(ALL) NOPASSWD: ALL'
+        validate: /usr/sbin/visudo -cf %s
+      with_items: "{{ users }}"
+

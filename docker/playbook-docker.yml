@@ -1,0 +1,44 @@
+---
+- name: prueba packer - docker
+  hosts: localhost
+  gather_facts: yes
+  become: true
+
+  vars:
+    docker_version: 5:19.03.12~3-0~debian-buster
+    docker_packages:
+      - docker-ce={{docker_version}}
+      - docker-ce-cli={{docker_version}}
+      - containerd
+    docker_dependencies:
+      - apt-transport-https
+      - ca-certificates
+      - gnupg2
+
+
+        #Jan 18 09:16:26 tpl-deb10 dockerd[10010]: time="2021-01-18T09:16:26.066693837-03:00" level=warning msg="Your kernel does not support swap memory limit"
+        #Jan 18 09:16:26 tpl-deb10 dockerd[10010]: time="2021-01-18T09:16:26.066955817-03:00" level=warning msg="Your kernel does not support cgroup rt period"
+        #Jan 18 09:16:26 tpl-deb10 dockerd[10010]: time="2021-01-18T09:16:26.067180935-03:00" level=warning msg="Your kernel does not support cgroup rt runtime"
+
+  tasks:
+
+   - name: ping localhost
+     ping:
+
+   - name: add Docker apt-key
+     apt_key:
+       url: https://download.docker.com/linux/debian/gpg
+
+   - name: Ensure dependencies are installed.
+     apt: name={{docker_dependencies}} state=present
+
+   - name: check docker packages
+     debug: msg={{ docker_packages }}
+   
+   - name: add Docker apt repository
+     apt_repository:
+       repo: deb [arch=amd64] https://download.docker.com/linux/{{ansible_distribution|lower}} {{ansible_distribution_release}} stable
+       filename: 'docker'
+
+   - name: install docker
+     apt: name={{ docker_packages }} state=present
