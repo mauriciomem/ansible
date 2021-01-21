@@ -1,0 +1,51 @@
+---
+- name: prueba packer - kubernetes - master node
+  hosts: localhost
+  gather_facts: yes
+  become: true
+
+  vars:
+    cidr_pod_network: x.x.x.x/x
+    cp_endpoint: host.example.org:6443
+
+  tasks:
+
+   - name: Initializing Kubernetes cluster
+     shell: kubeadm init --pod-network-cidr={{cidr_pod_network}} --control-plane-endpoint={{cp_endpoint}} --upload-certs
+     register: kube_init
+
+   - name: Show output kubeadm init master
+     debug: msg={{ kube_init.stdout }}
+
+   - name: Creating kubeadm master join command - token (1/3)
+     shell: kubeadm token create
+     register: master_token
+
+   - name: Creating kubeadm master join command - certs (2/3)
+     shell: kubeadm init phase upload-certs --upload-certs
+     register: master_cert_key
+
+   - name: Creating kubeadm master join command - ca cert hash (3/3)
+     shell: openssl x509 -pubkey -in /etc/kubernetes/pki/ca.crt | openssl rsa -pubin -outform der 2>/dev/null | openssl dgst -sha256 -hex | sed 's/^.* //'
+     register: master_ca_hash
+
+   - name: debug de salidas - token
+     debug: msg={{ master_token.stdout}}
+
+   - name: debug de salidas - cert
+     debug: msg={{ master_cert_key.stdout_lines[2]}}
+
+   - name: debug de salidas - ca_hash
+     debug: msg={{ master_ca_hash.stdout }}
+
+   - name: Generacion de variables
+     set_fact:
+       token: "{{ master_token.stdout }}"
+       cert_key: "{{ master_cert_key.stdout_lines[2] }}"
+       ca_hash: "{{ master_ca_hash.stdout }}"
+
+   - name: reviso set_fact
+     debug: msg="kubeadm init prueba token {{token}} cert {{cert_key}} ca hash {{ca_hash}}"
+
+  # kubevip
+  # cni
