@@ -1,0 +1,25 @@
+---
+- name: prueba packer - kubernetes
+  hosts: localhost
+  gather_facts: yes
+  become: true
+
+  vars:
+    cidr_pod_network: 10.244.0.0/16
+    cp_endpoint: k8spacker.labmvl.local:6443
+
+  tasks:
+
+   - name: Creating kubeadm worker join command
+     shell: kubeadm token create --print-join-command
+     register: worker_join
+
+   - name: debug de salidas - worker
+     debug: msg={{ worker_join.stdout}}
+
+   - name: Generacion de variables
+     set_fact:
+       join_cmd: "{{ worker_join.stdout }}"
+
+   - name: reviso set_fact
+     debug: msg="{{worker_join.stdout}}"

@@ -1,35 +1,53 @@
 ---
-- name: packer - kubernetes
+- name: prueba packer - kubernetes
   hosts: localhost
   gather_facts: yes
   become: true
 
   vars:
-    kubernetes_version: 1.20.2-00
+    kubernetes_version: 1.19.7-00
     # ubuntu vs debian https://raymii.org/s/tutorials/Ansible_-_Only_if_on_specific_distribution_or_distribution_version.html
+    # debian - versiones con un digito numerico adicional al final de la denominacion de la version
+    # versiones especificas en ansible no es posible a pesar de declarar la version, siempre utilizara la ultima estable:
+    # https://github.com/ansible/ansible/issues/29451
     kubernetes_packages:
       - package: kubeadm
-        version: "{{ kubernetes_version | default('1.19.7-00') }}"
+        version: "{{ kubernetes_version | default('1.19.7-0') }}"
       - package: kubectl 
-        version: "{{ kubernetes_version | default('1.19.7-00') }}"
+        version: "{{ kubernetes_version | default('1.19.7-0') }}"
       - package: kubelet
-        version: "{{ kubernetes_version | default('1.19.7-00') }}"
+        version: "{{ kubernetes_version | default('1.19.7-0') }}"
 
-    kubernetes_dependencies:
+    kubernetes_dependencies_deb:
       - apt-transport-https
       - curl
 
+    cidr_pod_network: 10.244.0.0/16
+    cp_endpoint: k8spacker.labmvl.local:6443
   tasks:
+
+   - name: Flush existing firewall rules
+     iptables:
+       flush: true 
+
+   - name: Stop and disable firewalld.
+     service:
+      name: firewalld
+      state: stopped
+      enabled: False
+     when: ansible_os_family == 'RedHat'
 
    - name: Ensure dependencies are installed.
      apt:
-       name: "{{ kubernetes_dependencies }}" 
+       name: "{{ kubernetes_dependencies_deb }}" 
        state: present
        update_cache: true
+     when: ansible_os_family == 'Debian'
 
    - name: add kubernetes apt-key
      apt_key:
        url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+     when: ansible_os_family == 'Debian'
 
    - name: check kubernetes packages
      debug: 
@@ -39,19 +57,45 @@
      apt_repository:
        repo: deb https://apt.kubernetes.io/ kubernetes-xenial main
        filename: 'kubernetes'
+     when: ansible_os_family == 'Debian'
 
-   - name: install kubernetes
+   - name: add kubernetes yum repository
+     copy:
+       dest: "/etc/yum.repos.d/kubernetes.repo"
+       content: |
+        [kubernetes]
+        name=Kubernetes
+        baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-\$basearch
+        enabled=1
+        gpgcheck=1
+        repo_gpgcheck=1
+        gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+        #exclude=kubelet kubeadm kubectl
+     when: ansible_os_family == 'RedHat'
+
+   - name: install kubernetes debian
      apt:
        name: "{{ item.package }}={{ item.version }}" 
        state: present
+       force: True              # horrible esto porque evita el control de firmas de los paquetes y los certifiados de los sitios web donde se alojan. No existe alternativa todavia.
        update_cache: true
      with_items: "{{ kubernetes_packages }}"
+     when: ansible_os_family == 'Debian'
 
-   - name: Hold kubeadm
+   - name: install kubernetes redhat
+     yum:
+       name: "{{ item.package }}-{{ item.version }}" 
+       allow_downgrade: yes
+       state: present
+     with_items: "{{ kubernetes_packages }}"
+     when: ansible_os_family == 'RedHat'
+
+   - name: Hold kubeadm debian
      dpkg_selections:
        name: "{{ item.package }}"
        selection: hold
      with_items: "{{ kubernetes_packages }}"
+     when: ansible_os_family == 'Debian'
 
    - name: create br_netfilter file and add module
      copy:
@@ -89,5 +133,15 @@
           "storage-opts": [ "overlay2.override_kernel_check=true" ]
         }
 
+   #- name: Initializing Kubernetes cluster
+   #  shell: kubeadm init --pod-network-cidr={{cidr_pod_network}} --control-plane-endpoint={{cp_endpoint}} --upload-certs
+   #  register: kubeadminit
+
+   #- name: See kubeadm init output
+   #  debug: msg="the output is {{ kubeadminit }}"
+
    # reiniciar el servicio de docker
    # verificar que docker este ok
+   #
+   #
+   # habilitar el servicio de kubelet systemctl enable kubelet
