@@ -1,0 +1,9 @@
+docker_packages:
+  - package: docker-ce
+    version: "{{ docker_version | default('19.03.9-3.el7') }}"
+  - package: docker-ce-cli
+    version: "{{ docker_version | default('19.03.9-3.el7') }}"
+  - package: containerd.io
+    version: "{{ containerd_version | default('1.4.3-3.1.el7') }}"
+docker_dependencies:
+  - ca-certificates

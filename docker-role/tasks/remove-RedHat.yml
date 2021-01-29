@@ -1,0 +1,12 @@
+---
+- name: remove docker RedHat
+  yum:
+    name: "{{ item.package }}"
+    state: "{{ docker_package_state }}"
+    update_cache: true
+  with_items: "{{ docker_packages }}"
+
+- name: apt autoremove packages.
+  yum:
+    autoremove: yes
+    state: "{{ docker_package_state }}"

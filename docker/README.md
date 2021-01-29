@@ -1,3 +1,0 @@
-#### Docker playbook
-
-**en desarrollo**

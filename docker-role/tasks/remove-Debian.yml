@@ -1,0 +1,14 @@
+---
+- name: remove docker debian
+  apt:
+    name: "{{ item.package }}"
+    state: "{{ docker_package_state }}"
+    purge: yes
+    update_cache: true
+  with_items: "{{ docker_packages }}"
+
+- name: apt autoremove packages.
+  apt:
+    autoremove: yes
+    purge: yes
+    state: "{{ docker_package_state }}"

@@ -1,0 +1,28 @@
+---
+
+- name: Definir sistema operativo.
+  include_vars: "{{ ansible_os_family }}.yml"
+
+- name: Setup docker packages.
+  include_tasks: "setup-{{ ansible_os_family }}.yml"
+  when: docker_remove is not defined
+
+- name: Docker enable at startup.
+  service:
+    name: "docker"
+    state: "{{ docker_service_state }}"
+    enabled: "{{ docker_service_enabled }}"
+  when: docker_remove is not defined
+
+- name: Remove docker.
+  include_tasks: "remove-{{ ansible_os_family }}.yml"
+  when: docker_remove is defined
+
+- name: docker folder erase.
+  file:
+    path: "{{ item }}"
+    state: "{{ docker_package_state }}"
+  loop:
+    - /opt/containerd
+    - /etc/docker
+  when: docker_remove is defined
