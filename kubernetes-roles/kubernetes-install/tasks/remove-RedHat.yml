@@ -1,0 +1,13 @@
+---
+
+- name: Remove kubernetes packages RedHat
+  yum:
+    name: "{{ item.package }}"
+    state: "{{ k8s_package_state }}"
+    update_cache: true
+  with_items: "{{ k8s_packages }}"
+
+- name: Yum autoremove packages.
+  yum:
+    autoremove: yes
+    state: "{{ k8s_package_state }}"

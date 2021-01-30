@@ -1,0 +1,110 @@
+---
+
+   - name: Flush existing firewall rules
+     iptables:
+       flush: true 
+
+   - name: Stop and disable firewalld.
+     service:
+      name: firewalld
+      state: stopped
+      enabled: False
+     when: ansible_os_family == 'RedHat'
+
+   - name: Ensure dependencies are installed.
+     apt:
+       name: "{{ kubernetes_dependencies_deb }}" 
+       state: present
+       update_cache: true
+     when: ansible_os_family == 'Debian'
+
+   - name: add kubernetes apt-key
+     apt_key:
+       url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+     when: ansible_os_family == 'Debian'
+
+   - name: check kubernetes packages
+     debug: 
+       msg: "{{ kubernetes_packages }}"
+   
+   - name: add kubernetes apt repository
+     apt_repository:
+       repo: deb https://apt.kubernetes.io/ kubernetes-xenial main
+       filename: 'kubernetes'
+     when: ansible_os_family == 'Debian'
+
+   - name: add kubernetes yum repository
+     copy:
+       dest: "/etc/yum.repos.d/kubernetes.repo"
+       content: |
+        [kubernetes]
+        name=Kubernetes
+        baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-\$basearch
+        enabled=1
+        gpgcheck=1
+        repo_gpgcheck=1
+        gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+        #exclude=kubelet kubeadm kubectl
+     when: ansible_os_family == 'RedHat'
+
+   - name: install kubernetes debian
+     apt:
+       name: "{{ item.package }}={{ item.version }}" 
+       state: present
+       force: True              # horrible esto porque evita el control de firmas de los paquetes y los certifiados de los sitios web donde se alojan. No existe alternativa todavia.
+       update_cache: true
+     with_items: "{{ kubernetes_packages }}"
+     when: ansible_os_family == 'Debian'
+
+   - name: install kubernetes redhat
+     yum:
+       name: "{{ item.package }}-{{ item.version }}" 
+       allow_downgrade: yes
+       state: present
+     with_items: "{{ kubernetes_packages }}"
+     when: ansible_os_family == 'RedHat'
+
+   - name: Hold kubeadm debian
+     dpkg_selections:
+       name: "{{ item.package }}"
+       selection: hold
+     with_items: "{{ kubernetes_packages }}"
+     when: ansible_os_family == 'Debian'
+
+   - name: create br_netfilter file and add module
+     copy:
+       dest: "/etc/modules-load.d/k8s.conf"
+       content: 'br_netfilter'
+
+   - name: Creating a file with content
+     copy:
+       dest: "/etc/sysctl.d/k8s.conf"
+       content: |
+         net.bridge.bridge-nf-call-ip6tables = 1
+         net.bridge.bridge-nf-call-iptables = 1
+   
+   - name: Disable swap currently running
+     shell: swapoff -a
+     args:
+       executable: /bin/bash
+
+   # Ok en debian y centos
+   - name: Disable swap
+     replace: 
+       path: "/etc/fstab"
+       regexp: '^([^#].*?\sswap\s+(sw|swap)\s+.*)$'
+       replace: '# \1'
+
+   - name: Change cgroup driver docker
+     copy:
+       dest: "/etc/docker/daemon.json"
+       content: |
+        {
+          "exec-opts": ["native.cgroupdriver=systemd"],
+          "log-driver": "json-file",
+          "log-opts": { "max-size": "100m" },
+          "storage-driver": "overlay2",
+          "storage-opts": [ "overlay2.override_kernel_check=true" ]
+        }
+
+   # habilitar el servicio de kubelet systemctl enable kubelet

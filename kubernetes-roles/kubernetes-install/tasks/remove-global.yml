@@ -1,0 +1,29 @@
+---
+
+- name: kubernetes folder erase.
+  file:
+    path: "{{ item }}"
+    state: "{{ k8s_package_state }}"
+  loop:
+    - "/etc/kubernetes"
+    - "/etc/cni.d"
+    - "/etc/modules-load.d/k8s.conf"
+    - "/etc/sysctl.d/k8s.conf"
+    - "/etc/docker/daemon.json"
+
+- name: Enable swap fstab.
+  replace: 
+    path: "/etc/fstab"
+    regexp: '^#(.*?\sswap\s+(sw|swap)\s+.*)$'
+    replace: '\1'
+
+- name: Enable running swap.
+  shell: "swapon -a"
+  args:
+    executable: /bin/bash
+  changed_when: false
+
+- name: Flush existing firewall rules.
+  iptables:
+    flush: true 
+  changed_when: false

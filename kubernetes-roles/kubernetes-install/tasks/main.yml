@@ -1,0 +1,27 @@
+---
+
+- name: Check operating system.
+  include_vars: "{{ ansible_os_family }}.yml"
+
+- name: Manage kubernetes install config.
+  include_tasks: "setup-global.yml"
+  when: k8s_remove is not defined
+
+- name: Manage kubernetes removal config.
+  include_tasks: "remove-global.yml"
+  when: k8s_remove is defined
+
+- name: Setup kubernetes install.
+  include_tasks: "setup-{{ ansible_os_family }}.yml"
+  when: k8s_remove is not defined
+
+- name: Remove kubernetes install.
+  include_tasks: "remove-{{ ansible_os_family }}.yml"
+  when: k8s_remove is defined
+
+- name: kubelet enable at startup.
+  service:
+    name: "kubelet"
+    state: "{{ k8s_service_state }}"
+    enabled: "{{ k8s_service_enabled }}"
+  when: k8s_remove is not defined

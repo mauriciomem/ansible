@@ -1,0 +1,21 @@
+---
+- name: Unhold packages.
+  shell: "apt-mark unhold {{ item.package }}"
+  args:
+    executable: /bin/bash
+  with_items: "{{ k8s_packages }}"
+  changed_when: false
+
+- name: Remove kubernetes packages debian
+  apt:
+    name: "{{ item.package }}"
+    state: "{{ k8s_package_state }}"
+    purge: yes
+    update_cache: true
+  with_items: "{{ k8s_packages }}"
+
+- name: apt autoremove packages.
+  apt:
+    autoremove: yes
+    purge: yes
+    state: "{{ k8s_package_state }}"

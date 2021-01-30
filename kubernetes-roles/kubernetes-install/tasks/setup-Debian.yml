@@ -1,0 +1,30 @@
+---
+
+- name: Ensure dependencies are installed.
+  apt:
+    name: "{{ k8s_dependencies }}" 
+    state: "{{ k8s_package_state }}"
+    update_cache: true
+
+- name: Add kubernetes apt-key.
+  apt_key:
+    url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+
+- name: Add kubernetes apt repository.
+  apt_repository:
+    repo: deb https://apt.kubernetes.io/ kubernetes-xenial main
+    filename: 'kubernetes'
+
+- name: Install packages.
+  apt:
+    name: "{{ item.package }}={{ item.version }}" 
+    state: "{{ k8s_package_state }}"
+    force: true              # horrible esto porque evita el control de firmas de los paquetes y los certifiados de los sitios web donde se alojan. No existe alternativa todavia.
+    update_cache: true
+  with_items: "{{ k8s_packages }}"
+
+- name: Hold packages. 
+  dpkg_selections:
+    name: "{{ item.package }}"
+    selection: hold
+  with_items: "{{ k8s_packages }}"

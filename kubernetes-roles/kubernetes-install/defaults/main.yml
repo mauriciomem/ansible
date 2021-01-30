@@ -1,0 +1,32 @@
+---
+
+# Kubernetes package options.
+k8s_package_state: absent
+#k8s_package_state: present
+
+# Kubernetes service options.
+k8s_service_state: stopped
+#k8s_service_state: started
+k8s_service_enabled: true
+k8s_restart_handler_state: restarted
+
+# Kubernetes version
+#k8s_version: 1.19.7-00 # Debian
+#k8s_version: 1.19.7-0	# RedHat
+
+# Kubernetes dependencies
+#k8s_dependencies:
+#  - apt-transport-https
+#  - curl
+
+# Kubernetes repositories
+# Debian based
+k8s_repo_apt_key: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+k8s_repo_apt_url: https://apt.kubernetes.io/ kubernetes-xenial main
+
+# RedHat based
+k8s_repo_yum_url: https://packages.cloud.google.com/yum/repos/kubernetes-el7-\$basearch
+k8s_repo_yum_key: https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+
+# Remove k8s
+k8s_remove: true

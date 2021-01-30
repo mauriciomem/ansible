@@ -6,7 +6,7 @@
     update_cache: true
   with_items: "{{ docker_packages }}"
 
-- name: apt autoremove packages.
+- name: Autoremove packages.
   yum:
     autoremove: yes
     state: "{{ docker_package_state }}"
