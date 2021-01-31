@@ -3,6 +3,11 @@ Role Name
 
 A brief description of the role goes here.
 
+Multi control plane kubernetes cluster ** work in progress**
+
+- no HA control plane endpoint -- kubevip,haproxy,metallb,etc.
+- no cni yet
+
 Requirements
 ------------
 

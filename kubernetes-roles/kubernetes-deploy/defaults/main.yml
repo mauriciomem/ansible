@@ -1,2 +1,11 @@
 ---
 # defaults file for kubernetes-deploy
+
+# kubeadm init params
+#cidr_pod_network: x.x.x.x/x
+cidr_pod_network: 10.244.0.0/16
+#controlplane_ep: host.example.org:6443
+controlplane_ep: master01.labmvl.local:6443
+
+# kubeadm control plane join
+hash: sha256

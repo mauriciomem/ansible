@@ -1,2 +1,16 @@
 ---
-# tasks file for kubernetes-deploy
+
+#- name: Check operating system.
+#  include_vars: "{{ ansible_os_family }}.yml"
+
+- name: Deploy control plane nodes.
+  include_tasks: "master.yml"
+  when: "'masters' in group_names and first is defined"
+
+- name: Add control plane nodes.
+  include_tasks: "join-masters.yml"
+  when: "'masters' in group_names and first is not defined"
+
+- name: Deploy worker nodes.
+  include_tasks: "masters.yml"
+  when: "'workers' in group_names"

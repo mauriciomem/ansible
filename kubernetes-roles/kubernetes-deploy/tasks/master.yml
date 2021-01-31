@@ -1,0 +1,37 @@
+---
+
+- name: Check if already deployed node.
+  shell: kubectl --kubeconfig=/etc/kubernetes/admin.conf cluster-info
+  register: kubeadm_status
+  changed_when: false
+
+- name: debug kubeadm status
+  debug: msg="{{kubeadm_status.failed}}"
+
+- name: Initializing Kubernetes cluster
+  shell: kubeadm init --pod-network-cidr={{cidr_pod_network}} --control-plane-endpoint={{controlplane_ep}} --upload-certs
+  when: kubeadm_status.failed == true
+
+- name: Creating kubeadm master join command - token (1/3)
+  shell: kubeadm token create
+  register: master_token
+  changed_when: false
+
+- name: Creating kubeadm master join command - certs (2/3)
+  shell: kubeadm init phase upload-certs --upload-certs
+  register: master_cert_key
+  changed_when: false
+
+- name: Creating kubeadm master join command - ca cert hash (3/3)
+  shell: openssl x509 -pubkey -in /etc/kubernetes/pki/ca.crt | openssl rsa -pubin -outform der 2>/dev/null | openssl dgst -{{ hash }} -hex | sed 's/^.* //'
+  register: master_ca_hash
+  changed_when: false
+
+- name: Generacion de variables
+  set_fact:
+    token: "{{ master_token.stdout }}"
+    cert_key: "{{ master_cert_key.stdout_lines[2] }}"
+    ca_hash: "{{ master_ca_hash.stdout }}"
+
+# kubevip
+# cni
