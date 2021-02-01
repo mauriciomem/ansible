@@ -2,3 +2,6 @@
 
 - name: docker service restart
   service: "name=docker state={{ docker_restart_handler_state }}"
+
+- name: sysctl restart config
+  service: "name=systemd-sysctl state={{ sysctl_restart_handler_state }}"

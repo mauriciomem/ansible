@@ -28,8 +28,9 @@ k8s_repo_apt_url: https://apt.kubernetes.io/ kubernetes-xenial main
 k8s_repo_yum_url: https://packages.cloud.google.com/yum/repos/kubernetes-el7-\$basearch
 k8s_repo_yum_key: https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
 
-# Restart docker after cgroup driver change
-docker_restart_handler_state: restart
+# Restart docker and sysctl services after changes
+docker_restart_handler_state: restarted
+sysctl_restart_handler_state: restarted
 
 # Remove k8s
 #k8s_remove: true
