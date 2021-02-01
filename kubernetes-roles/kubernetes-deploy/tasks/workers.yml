@@ -1,7 +1,12 @@
 ---
 
-- name: Creating kubeadm worker join command
-  shell: kubeadm token create --print-join-command
+# el comando kubeadm worker join lo debe aplicar el master
+#- name: Creating kubeadm worker join command
+#  shell: kubeadm token create --print-join-command
+#  register: worker_join
+
+- name: Apply kubeadm join command
+  shell: "{{ hostvars['master01']['join_worker'] }}"
   register: worker_join
 
 - name: debug de salidas - worker

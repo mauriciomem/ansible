@@ -5,33 +5,52 @@
   register: kubeadm_status
   changed_when: false
 
-- name: debug kubeadm status
-  debug: msg="{{kubeadm_status.failed}}"
+  #- name: debug kubeadm status
+  #debug: msg="{{kubeadm_status.failed}}"
 
 - name: Initializing Kubernetes cluster
   shell: kubeadm init --pod-network-cidr={{cidr_pod_network}} --control-plane-endpoint={{controlplane_ep}} --upload-certs
   when: kubeadm_status.failed == true
 
-- name: Creating kubeadm master join command - token (1/3)
-  shell: kubeadm token create
+- name: Creating kubeadm join command - token (1/3)
+  #shell: kubeadm token create
+  shell: kubeadm token create --print-join-command
   register: master_token
-  changed_when: false
+  #changed_when: false
+
+- name: kubeadm join command token 
+  debug: msg={{master_token}}
+
+- name: kubeadm token value only
+  debug: msg={{master_token.stdout | regex_search('token\s(\w+\.\w+)\s','\\1' ) }}
 
 - name: Creating kubeadm master join command - certs (2/3)
   shell: kubeadm init phase upload-certs --upload-certs
   register: master_cert_key
-  changed_when: false
+  #changed_when: false
 
 - name: Creating kubeadm master join command - ca cert hash (3/3)
   shell: openssl x509 -pubkey -in /etc/kubernetes/pki/ca.crt | openssl rsa -pubin -outform der 2>/dev/null | openssl dgst -{{ hash }} -hex | sed 's/^.* //'
   register: master_ca_hash
-  changed_when: false
+  #changed_when: false
 
-- name: Generacion de variables
-  set_fact:
-    token: "{{ master_token.stdout }}"
-    cert_key: "{{ master_cert_key.stdout_lines[2] }}"
-    ca_hash: "{{ master_ca_hash.stdout }}"
+  #- name: Generacion de variables
+  #  set_fact:
+  #  join_worker: "{{ master_token.stdout }}"
+  #  cert_key: "{{ master_cert_key.stdout_lines[2] }}"
+  #  ca_hash: "{{ master_ca_hash.stdout }}"
+  #  #token: "{{ master_token.stdout_lines[0] | regex_search('token\s(\w+\.\w+)\s') }}"
+
+- set_fact: join_worker={{ master_token.stdout }}
+- set_fact: cert_key={{ master_cert_key.stdout_lines[2] }}
+- set_fact: ca_hash={{ master_ca_hash.stdout }}
+- set_fact: token={{master_token.stdout | regex_search('token\s(\w+\.\w+)\s','\\1' ) }}
+
+- name: debug de variables
+  debug: msg="Estas son las variables {{join_worker}} y {{cert_key}} y {{ca_hash}} y {{token}}"
+
+- name: que sale como token
+  debug: msg={{token}}
 
 # kubevip
 # cni

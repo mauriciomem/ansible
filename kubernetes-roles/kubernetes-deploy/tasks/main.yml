@@ -5,12 +5,12 @@
 
 - name: Deploy control plane nodes.
   include_tasks: "master.yml"
-  when: "'masters' in group_names and first is defined"
+  when: "'master01' in inventory_hostname"
 
 - name: Add control plane nodes.
   include_tasks: "join-masters.yml"
-  when: "'masters' in group_names and first is not defined"
+  when: "'masters' in group_names and 'master01' not in inventory_hostname"
 
 - name: Deploy worker nodes.
-  include_tasks: "masters.yml"
+  include_tasks: "workers.yml"
   when: "'workers' in group_names"

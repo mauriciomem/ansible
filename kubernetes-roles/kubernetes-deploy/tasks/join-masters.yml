@@ -1,15 +1,16 @@
 ---
 
-- name: reviso set_fact
-  debug: msg=kubeadm join {{ controlplane_ep }} --token {{ hostvars['master01']['token'] }} --discovery-token-ca-cert-hash {{ hash }}:{{ hostvars['master01']['ca_hash'] }} --control-plane --certificate-key {{ hostvars['master01']['cert_key'] }}
+#- name: reviso set_fact
+#  debug: msg=kubeadm join {{ controlplane_ep }} --token {{ hostvars['master01']['token'] }} --discovery-token-ca-cert-hash {{ hash }}:{{ hostvars['master01']['ca_hash'] }} --control-plane --certificate-key {{ hostvars['master01']['cert_key'] }}
 
-  #- name: Check if already deployed node.
-  #shell: kubectl --kubeconfig=/etc/kubernetes/admin.conf cluster-info
-  #register: kubeadm_status
-  #changed_when: false
+- name: Check if already deployed node.
+  shell: kubectl --kubeconfig=/etc/kubernetes/admin.conf cluster-info
+  register: kubeadm_status
+  changed_when: false
 
-  #- name: debug kubeadm status
-  #debug: msg={{kubeadm_status.failed}}
+- name: debug kubeadm status
+  debug: msg={{kubeadm_status.failed}}
 
 - name: Join Kubernetes cluster as control plane node
   shell: kubeadm join {{ controlplane_ep }} --token {{ hostvars['master01']['token'] }} --discovery-token-ca-cert-hash {{ hash }}:{{ hostvars['master01']['ca_hash'] }} --control-plane --certificate-key {{ hostvars['master01']['cert_key'] }}
+  when: kubeadm_status.failed == true

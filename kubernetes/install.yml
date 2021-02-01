@@ -133,15 +133,4 @@
           "storage-opts": [ "overlay2.override_kernel_check=true" ]
         }
 
-   #- name: Initializing Kubernetes cluster
-   #  shell: kubeadm init --pod-network-cidr={{cidr_pod_network}} --control-plane-endpoint={{cp_endpoint}} --upload-certs
-   #  register: kubeadminit
-
-   #- name: See kubeadm init output
-   #  debug: msg="the output is {{ kubeadminit }}"
-
-   # reiniciar el servicio de docker
-   # verificar que docker este ok
-   #
-   #
    # habilitar el servicio de kubelet systemctl enable kubelet
