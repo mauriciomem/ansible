@@ -1,38 +1,66 @@
-Role Name
-=========
+## Kubernetes cluster deployment
 
-A brief description of the role goes here.
+**work in progress**
 
-Requirements
-------------
+Install all necesary Kubernetes binaries and ajust the minimal configuration parameters on a target machine to join a Kubernetes instance.
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+### Role
 
-Role Variables
---------------
+This role install kubeadm, kubectl and kubelet binaries, and configure a machine to run Kubernetes with docker as a container runtime. 
+Also, it can remove all Kubernetes binaries and restore the machine previous configuration if it's necessary.
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+### Requirements
 
-Dependencies
-------------
+  - Install ansible: [Ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
+  - Run docker-role: [mauriciomem/ansible/docker-role](https://github.com/mauriciomem/ansible/tree/main/docker-role)
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+**Tested on**
+ - CentOS 7
+ - Debian 10
 
-Example Playbook
-----------------
+**Tested with**
+ - packer 1.6.6 _(go1.15.6)_
+ - ansible 2.9.16 _(python 2.7.16 [GCC 8.3.0])_
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
+### Run
 
-    - hosts: servers
-      roles:
-         - { role: username.rolename, x: 42 }
+Example playbook file
 
-License
--------
+```
+  ---
+  - name: kubernetes install
+    hosts: servers
+    gather_facts: yes
+    become: true
 
-BSD
+    roles:
+      # docker container runtime install.
+      - { role: docker-role, dir: 'docker-role' }
+      # kubernetes binaries and os preparation.
+      - { role: kubernetes-install, dir: 'kubernetes-install' }
+```
+Run command example
 
-Author Information
-------------------
+```
+  ansible-playbook -u ansible -i inventory playbook.yml
+```
+Example inventory file
 
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+```
+  [servers]
+  master01  ansible_host=10.1.1.149
+  master02  ansible_host=10.1.1.251
+  worker01  ansible_host=10.1.1.252
+```
+
+### License
+
+MIT
+
+### References
+
+[Bootstrapping clusters with kubeadm](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/)
+
+### Author
+
+[Mauricio Mitolo](https://github.com/mauriciomem)

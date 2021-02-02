@@ -1,43 +1,85 @@
-Role Name
-=========
+## Kubernetes cluster deployment
 
-A brief description of the role goes here.
+**work in progress**
 
-Multi control plane kubernetes cluster ** work in progress**
+A quick alternative to deploy kubernetes clusters.
 
-- no HA control plane endpoint -- kubevip,haproxy,metallb,etc.
-- no cni yet
+### Role
 
-Requirements
-------------
+Deploy a single or multi control plane kubernetes cluster. This role uses kubeadm commands for boostrapping worker and control plane nodes.
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+**Working on:**
+ - single control plane endpoint
+ - deploying optional components:
+   - default CNI
+   - On premise LoadBalancer Service (metalLB)
+   - On premise ingress controller (nginx)
 
-Role Variables
---------------
+This role should not be used on production deployments. It doesn't cover:
+ - node certificate management.
+ - roles and authentication.
+ - separate high availability etcd database cluster.
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+### Requirements
 
-Dependencies
-------------
+  - Install ansible: [Ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
+  - Run docker role: [mauriciomem/ansible/docker-role](https://github.com/mauriciomem/ansible/tree/main/docker-role)
+  - Run kubernetes install: [mauriciomem/ansible/kubernetes-roles/kubernetes-install](https://github.com/mauriciomem/ansible/tree/main/kubernetes-roles/kubernetes-install)
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+ > **Note**: Also, if you are interested in bootstrapping compute instances also, I suggest you looking solutions like packer to build server images from ISO files and vagrant/terraform to deploy them locally or on cloud environments. You can check some packer examples on [mauriciomem/packer_vsphere](https://github.com/mauriciomem/packer_vsphere) using the vsphere-iso builder.
 
-Example Playbook
-----------------
+**Tested on**
+ - CentOS 7
+ - Debian 10
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
+**Tested with**
+ - packer 1.6.6 _(go1.15.6)_
+ - ansible 2.9.16 _(python 2.7.16 [GCC 8.3.0])_
 
-    - hosts: servers
-      roles:
-         - { role: username.rolename, x: 42 }
+### Run
 
-License
--------
+Example playbook file
 
-BSD
+```
+  ---
+  - name: kubernetes cluster deploy
+    hosts: servers
+    gather_facts: yes
+    become: true
 
-Author Information
-------------------
+    roles:
+      # docker container runtime install.
+      - { role: docker-role, dir: 'docker-role' }
+      # kubernetes binaries and os preparation.
+      - { role: kubernetes-install, dir: 'kubernetes-install' }
+      # kubernetes cluster deployment
+      - { role: kubernetes-deploy, dir: 'kubernetes-deploy' }
+```
+Run command example
 
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+```
+  ansible-playbook -u ansible -i inventory playbook.yml
+```
+Example inventory file
+
+```
+  [servers]
+  master01  ansible_host=10.1.1.149
+  master02  ansible_host=10.1.1.251
+  worker01  ansible_host=10.1.1.252
+
+  [masters]
+  master01
+  master02
+
+  [workers]
+  worker01
+```
+
+### License
+
+MIT
+
+### Author
+
+[Mauricio Mitolo](https://github.com/mauriciomem)
