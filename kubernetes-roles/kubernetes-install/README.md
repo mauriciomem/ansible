@@ -1,15 +1,15 @@
-## Kubernetes cluster deployment
+# Kubernetes cluster deployment
 
-**work in progress**
+_**work in progress**_
 
 Install all necesary Kubernetes binaries and ajust the minimal configuration parameters on a target machine to join a Kubernetes instance.
 
-### Role
+## Role
 
 This role install kubeadm, kubectl and kubelet binaries, and configure a machine to run Kubernetes with docker as a container runtime. 
 Also, it can remove all Kubernetes binaries and restore the machine previous configuration if it's necessary.
 
-### Requirements
+## Requirements
 
   - Install ansible: [Ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
   - Run docker-role: [mauriciomem/ansible/docker-role](https://github.com/mauriciomem/ansible/tree/main/docker-role)
@@ -22,7 +22,7 @@ Also, it can remove all Kubernetes binaries and restore the machine previous con
  - packer 1.6.6 _(go1.15.6)_
  - ansible 2.9.16 _(python 2.7.16 [GCC 8.3.0])_
 
-### Run
+## Run
 
 Example playbook file
 
@@ -53,14 +53,14 @@ Example inventory file
   worker01  ansible_host=10.1.1.252
 ```
 
-### License
+## License
 
 MIT
 
-### References
+## References
 
 [Bootstrapping clusters with kubeadm](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/)
 
-### Author
+## Author
 
 [Mauricio Mitolo](https://github.com/mauriciomem)
