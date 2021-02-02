@@ -18,7 +18,7 @@ Deploy a single or multi control plane kubernetes cluster. This role uses kubead
 This role should not be used on production deployments. It doesn't cover:
  - node certificate management.
  - roles and authentication.
- - separate high availability etcd database cluster.
+ - external high availability etcd database cluster.
 
 ### Requirements
 
