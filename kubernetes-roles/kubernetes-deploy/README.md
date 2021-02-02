@@ -1,26 +1,26 @@
-## Kubernetes cluster deployment
+# Kubernetes cluster deployment
 
-**work in progress**
+_**work in progress**_
 
 A quick alternative to deploy kubernetes clusters.
 
-### Role
+## Role
 
 Deploy a single or multi control plane kubernetes cluster. This role uses kubeadm commands for boostrapping worker and control plane nodes.
 
-**Working on:**
+_**Working on:**_
  - single control plane endpoint
  - deploying optional components:
    - default CNI
-   - On premise LoadBalancer Service (metalLB)
-   - On premise ingress controller (nginx)
+   - On premise LoadBalancer Service [metalLB](https://metallb.universe.tf/)
+   - On premise Kubernetes Ingress controller [nginx](https://kubernetes.github.io/ingress-nginx/)
 
 This role should not be used on production deployments. It doesn't cover:
  - node certificate management.
  - roles and authentication.
  - external high availability etcd database cluster.
 
-### Requirements
+## Requirements
 
   - Install ansible: [Ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
   - Run docker role: [mauriciomem/ansible/docker-role](https://github.com/mauriciomem/ansible/tree/main/docker-role)
@@ -36,7 +36,7 @@ This role should not be used on production deployments. It doesn't cover:
  - packer 1.6.6 _(go1.15.6)_
  - ansible 2.9.16 _(python 2.7.16 [GCC 8.3.0])_
 
-### Run
+## Run
 
 Example playbook file
 
@@ -76,10 +76,10 @@ Example inventory file
   worker01
 ```
 
-### License
+## License
 
 MIT
 
-### Author
+## Author
 
 [Mauricio Mitolo](https://github.com/mauriciomem)
