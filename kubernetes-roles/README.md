@@ -1,11 +1,12 @@
-## kubernetes install and deploy with kubeadm
+# Kubernetes install & deploy
 
-**work in progress**
-Roles para preparar instancias y deplegar nodos control plane y worker con o sin alta disponibilidad para pruebas y entornos de laboratorio.
+_**work in progress**_
 
-### Roles
+Quickly deploy Kubernetes clusters for lab and app development. It follows the official Kubernetes practices, but it's not intended for use in production.
 
-Multi control plane kubernetes cluster. **work in progress**
+## Roles
+
+Single or multi control plane kubernetes cluster. _**work in progress**_
 
  * kubernetes-install: Prepare instances to join a kubernetes cluster
  * kubernetes-deploy: kubeadm init & kubeadm join as worker or control plane nodes
@@ -14,7 +15,7 @@ Multi control plane kubernetes cluster. **work in progress**
  - single control plane endpoint
  - default cni
 
-### Requirements
+## Requirements
 
   - Install ansible: [Ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
   - Run docker role: [mauriciomem/docker-role](https://github.com/mauriciomem/ansible/tree/main/docker-role)
@@ -27,7 +28,7 @@ Multi control plane kubernetes cluster. **work in progress**
  - packer 1.6.6 _(go1.15.6)_
  - ansible 2.9.16 _(python 2.7.16 [GCC 8.3.0])_
 
-### Run
+## Run
 
 Example playbook file
 
@@ -56,17 +57,17 @@ Example inventory file
   worker01  ansible_host=10.1.1.252
 
   [masters]
-  master01  first=true
+  master01
   master02
 
   [workers]
   worker01
 ```
 
-### License
+## License
 
 MIT
 
-### Author
+## Author
 
 [Mauricio Mitolo](https://github.com/mauriciomem)
