@@ -1,0 +1,33 @@
+---
+- name: Copia de configuracion global de apache ajustada (Debian)
+  template:
+   src: "{{ http_config_file }}"
+   dest: "{{ http_config_path }}"
+
+- name: Copia de configuracion de vhost de apache (Debian)
+  template:
+   src:  "vhost.conf.j2"
+   dest: "{{ http_config_path }}sites-available/{{ http_vhost_site }}.conf"
+
+- name: Set apache vhost site permissions
+  file:
+   path: "/var/www/{{ http_vhost_site }}/public_html"
+   state: directory
+   owner: "{{ http_user }}"
+   group: "{{ http_user }}"
+   mode: '0755'
+
+- name: Set vhost file ownership and permissions
+  file:
+   path: "/var/www/{{ http_vhost_site }}/public_html/{{ http_vhost_file }}"
+   state: file
+   owner: "{{ http_user }}"
+   group: "{{ http_user }}"
+   mode: '0644'
+
+- name: Add vhost symlink in sites-enabled.
+  file:
+   src: "{{ http_config_path }}sites-available/{{ http_vhost_site }}.conf"
+   dest: "{{ http_config_path }}sites-enabled/{{ http_vhost_site }}.conf"
+   state: link
+  notify: "Restart Apache Service"

@@ -1,0 +1,16 @@
+---
+- name: Update apt cache (Debian).
+  apt: 
+   update_cache: yes 
+   cache_valid_time: 3600
+
+- name: Manejo de paquetes (Debian).
+  package:
+    name: "{{ http_pcks }}"
+    state: "{{ http_pcks_state }}"
+
+- name: Remover configuracion de vhost (Debian)
+  file:
+   path: "{{ http_config_path }}sites-available/"
+   state: "{{ http_folder_state }}"
+  when: apache_remove is defined

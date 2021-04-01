@@ -1,0 +1,29 @@
+---
+# tasks file for mmitolo.apache
+
+- name: Definir sistema operativo.
+  include_vars: "{{ ansible_os_family }}.yml"
+
+- name: Manage apache packages.
+  include_tasks: "setup-{{ ansible_os_family }}.yml"
+
+- name: Manage apache global config.
+  include_tasks: "setup-global.yml"
+
+- name: Configurar apache.
+  include_tasks: "configure-{{ ansible_os_family }}.yml"
+  when: apache_remove is not defined
+
+- name: Asegurar que apache se encuentre instalado y habilitado al inicio.
+  service:
+    name: "{{ http_service }}"
+    state: "{{ http_state }}"
+    enabled: true
+  when: apache_remove is not defined
+
+#- name: Revisar que el sitio regrese un 200 como http status y contenga la palabra "Hola" en su contenido.
+#  uri:
+#    url: http://{{ ansible_default_ipv4.address }}
+#    return_content: yes
+#  register: webpage
+#  failed_when: "'Hola' not in webpage.content"

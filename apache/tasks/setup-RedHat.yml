@@ -1,0 +1,18 @@
+---
+- name: Manejo de paquetes de apache (RedHat).
+  package:
+   name: "{{ http_pcks }}"
+   state: "{{ http_pcks_state }}"
+
+- name: Manejo de servicio http en firewalld (RedHat).
+  firewalld:
+   service: http
+   permanent: yes
+   immediate: yes
+   state: "{{firewalld_http_rule}}"
+
+- name: Creacion de carpetas sites enabled and available (RedHat)
+  file:
+   path: "/etc/httpd/{{ item }}"
+   state: "{{ http_folder_state }}"
+  with_items: "{{ http_config_path_vhost }}"

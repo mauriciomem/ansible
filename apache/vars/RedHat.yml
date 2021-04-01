@@ -1,0 +1,26 @@
+---
+# Configuracion global variables apache
+## rutas servicio
+http_config_path: "/etc/httpd/conf/"
+http_config_vhost_path: "/etc/httpd/"
+http_log_path: "/var/log/httpd/"
+## configuracion, nombre de servicios.
+http_config_file: "httpd.conf"
+http_service: httpd
+http_daemon: httpd
+## carpetas vhost a crear
+http_config_path_vhost: 
+ - sites-enabled
+ - sites-available
+
+# usuario de servicio
+http_user: apache
+
+# nombre paquetes instalacion
+http_pcks:
+ - httpd
+ - httpd-tools
+
+# ajustes configuracion global apache
+http_config_file_items:
+    - line: "Include sites-enabled/*.conf"

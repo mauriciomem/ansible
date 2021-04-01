@@ -1,0 +1,32 @@
+---
+# defaults file for mauriciomem.apache.
+
+# Puertos por defecto servicio vhost.
+http_default_port: 80
+http_default_ssl_port: 443
+
+# Indice de vhost y nombre de configuracion de apache.
+http_vhost_file: "index.html"
+http_vhost_site: "defaultvhost"
+
+# Definicion de nombre al que atendera el vhost.
+http_vhost_servername: "defaultvhost.labmvl.local"
+http_vhost_serveralias: "vhost.labmvl.local"
+
+# Si se activa la variable se procede a eliminar el servicio de apache y todos sus archivos generados.
+#apache_remove: true
+
+# Si se activa la variable apache_remove se debera eliminar los paquetes de apache con los directorios y archivos relacionados.
+http_pcks_state: present
+#http_pcks_state: absent
+http_folder_state: directory
+#http_folder_state: absent
+
+# Verificacion del estado del servicio con la finalizacion de la instalacion y configuracion
+http_state: started
+http_restart_state: restarted
+
+# Servicio firewalld para familia de SO basados en RedHat. Se puede eliminar regla al eliminar paquetes y configuracion.
+firewalld_service: started
+firewalld_restart_state: restarted
+firewalld_http_rule: enabled

@@ -1,0 +1,35 @@
+# Application: {{http_vhost_site}} #
+<VirtualHost *:{{ http_default_port }}>
+  ServerName {{ http_vhost_servername }}
+{% if http_vhost_serveralias is defined %}
+  ServerAlias {{ http_vhost_serveralias }}
+{% endif %}
+{% if http_vhost_serveradmin is defined %}
+  ServerAdmin {{ http_vhost_serveradmin }}
+{% endif %}
+{% if http_vhost_site is defined %}
+  DocumentRoot "/var/www/{{ http_vhost_site }}/public_html"
+{% endif %}
+{% if http_vhost_file is defined %}
+  DirectoryIndex "{{ http_vhost_file }}"
+{% else %}
+  DirectoryIndex {{ "index.html.js"| truncate(3, True, '') }}
+{% endif %}
+
+{% if http_vhost_site is defined %}
+    <Directory "/var/www/{{ http_vhost_site }}/public_html/">
+        Options +Includes -Indexes +FollowSymLinks
+        AllowOverride All
+        Require all granted
+  </Directory>
+{% endif %}
+
+{% if ansible_os_family == "RedHat" %}
+    ErrorLog {{http_log_path}}{{http_vhost_site}}_error.log
+    CustomLog {{http_log_path}}{{http_vhost_site}}_requests.log combined
+{% elif ansible_os_family == "Debian" %}
+    ErrorLog {{http_log_path}}{{http_vhost_site}}_error.log
+    CustomLog {{http_log_path}}{{http_vhost_site}}_requests.log combined
+{% endif %}
+
+</VirtualHost>

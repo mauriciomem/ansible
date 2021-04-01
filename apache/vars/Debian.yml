@@ -1,0 +1,19 @@
+---
+# Configuracion global variables apache
+## rutas servicio
+http_config_path: "/etc/apache2/"
+http_log_path: "/var/log/apache2/"
+## configuracion, nombre de servicios.
+http_config_file: "apache2.conf"
+http_service: apache2
+http_daemon: apache2
+
+# usuario de servicio
+http_user: www-data
+
+# nombre paquetes instalacion
+http_pcks: 
+ - apache2
+ - apache2-bin
+ - apache2-data
+ - apache2-utils
