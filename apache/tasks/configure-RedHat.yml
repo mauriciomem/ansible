@@ -11,7 +11,7 @@
 
 - name: Set apache vhost site permissions
   file:
-   path: "/var/www/{{ http_vhost_site }}/public_html"
+   path: "{{ http_root_site }}/{{ http_vhost_site }}/public_html"
    state: directory
    owner: "{{ http_user }}"
    group: "{{ http_user }}"
@@ -19,7 +19,7 @@
 
 - name: Set vhost file ownership and permissions
   file:
-   path: "/var/www/{{ http_vhost_site }}/public_html/{{ http_vhost_file }}"
+   path: "{{ http_root_site }}/{{ http_vhost_site }}/public_html/{{ http_vhost_file }}"
    state: file
    owner: "{{ http_user }}"
    group: "{{ http_user }}"

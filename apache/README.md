@@ -6,7 +6,7 @@ La instalacion permite preparar un virtual host listo para usar por la aplicacio
 ## Requirements
 
 Interprete python en agente
-Usuario con privilegios para instalar paquetes, editar configuracion en `/etc/[paquete apache]` y en `/var/www/[vhost]`
+Usuario con privilegios para instalar paquetes, editar configuracion en `/etc/[paquete apache]` y en `[www root]/[vhost]`
 
 ## Role Variables
 
@@ -18,6 +18,12 @@ Puertos a utilizar solo por vhost:
 ```
 	http_default_port: 80
 	http_default_ssl_port: 443
+```
+
+Carpeta raiz para presentar la aplicacion a traves del servicio web:
+
+```
+	http_root_site: "/var/www"
 ```
 
 Valores por defecto de indice de vhost y nombre de configuracion de apache:
@@ -92,6 +98,7 @@ Playbook de ejemplo para instalar el servicio de apache y configurar el vhost `w
   become: yes
   roles:
   - role: mauriciomem.apache
+    http_root_site: "/opt/www"
     http_vhost_file: "index.html"
     http_vhost_site: "webfoo"
     http_vhost_servername: "webfoo.example.com.ar"

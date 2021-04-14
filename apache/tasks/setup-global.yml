@@ -1,17 +1,17 @@
 ---
 - name: Creacion de carpeta de sitio de vhost
   file:
-   path: "/var/www/{{ http_vhost_site }}/public_html"
+   path: "{{ http_root_site }}/{{ http_vhost_site }}/public_html"
    state: "{{ http_folder_state }}"
 
 - name: Gestion de archivo index de prueba para vhost apache
   template:
    src: "index.html.j2"
-   dest: "/var/www/{{ http_vhost_site }}/public_html/{{ http_vhost_file }}"
+   dest: "{{ http_root_site }}/{{ http_vhost_site }}/public_html/{{ http_vhost_file }}"
   when: apache_remove is not defined
 
 - name: Eliminacion de carpeta vhost de apache
   file:
-   path: "/var/www/{{ http_vhost_site }}"
+   path: "{{ http_root_site }}/{{ http_vhost_site }}"
    state: "{{ http_folder_state }}"
   when: apache_remove is defined

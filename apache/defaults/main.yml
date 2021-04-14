@@ -13,6 +13,9 @@ http_vhost_site: "defaultvhost"
 http_vhost_servername: "defaultvhost.labmvl.local"
 http_vhost_serveralias: "vhost.labmvl.local"
 
+# Carpeta raiz del contenido
+http_root_site: "/var/www"
+
 # Si se activa la variable se procede a eliminar el servicio de apache y todos sus archivos generados.
 #apache_remove: true
 

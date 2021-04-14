@@ -8,7 +8,7 @@
   ServerAdmin {{ http_vhost_serveradmin }}
 {% endif %}
 {% if http_vhost_site is defined %}
-  DocumentRoot "/var/www/{{ http_vhost_site }}/public_html"
+  DocumentRoot "{{ http_root_site }}/{{ http_vhost_site }}/public_html"
 {% endif %}
 {% if http_vhost_file is defined %}
   DirectoryIndex "{{ http_vhost_file }}"
@@ -17,7 +17,7 @@
 {% endif %}
 
 {% if http_vhost_site is defined %}
-    <Directory "/var/www/{{ http_vhost_site }}/public_html/">
+    <Directory "{{ http_root_site }}/{{ http_vhost_site }}/public_html/">
         Options +Includes -Indexes +FollowSymLinks
         AllowOverride All
         Require all granted
